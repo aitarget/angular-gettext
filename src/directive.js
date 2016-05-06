@@ -84,21 +84,23 @@ angular.module('gettext').directive('translate', function (gettextCatalog, $pars
                         }
 
                         // Avoid redundant swaps
-                        if (translated === trim(oldContents.html())){
+                        if (translated === trim(element.html())){ // using oldContents.html() is wrong
                             // Take care of unlinked content
                             if (linking){
-                                $compile(oldContents)(scope);
+                                var content = $compile(oldContents)(scope);
+                                element.append(content.contents());
+                                content.remove();
                             }
                             return;
                         }
 
                         // Swap in the translation
                         var newWrapper = angular.element('<span>' + translated + '</span>');
-                        $compile(newWrapper.contents())(scope);
+                        $compile(newWrapper)(scope);
                         var newContents = newWrapper.contents();
-
                         $animate.enter(newContents, element);
                         $animate.leave(oldContents);
+                        newWrapper.remove();
                     }
 
                     if (attrs.translateN) {
